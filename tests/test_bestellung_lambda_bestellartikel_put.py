@@ -6,10 +6,9 @@ from src.bestellartikel_dto import BestellartikelDTO
 from tests.helper import event, lambda_response, DEFAULT_TENANT_ID
 
 
-def test_update_bestellartikel_ok(lambda_context, dynamodb_table):
+def test_update_bestellartikel_ok(lambda_context, bestellartikel_table):
     item = {
         'bezeichnung': "Rotwein",
-        "preisInEuro": "5.21",
         "gruppe": "Wein"
     }
     createdBestellartikel = bestellartikel_controller.create_bestellartikel(
@@ -21,20 +20,18 @@ def test_update_bestellartikel_ok(lambda_context, dynamodb_table):
     }
     itemUpdate = {
         'bezeichnung': "Rotwein",
-        "preisInEuro": "6.21",
         "gruppe": "Wein"
     }
     response = bestellung_handler.handle(event(
         '/api/bestellartikel/{id}', 'PUT', json.dumps(itemUpdate), pathParameters), lambda_context)
 
     assert response == lambda_response(200, BestellartikelDTO(
-        "Rotwein", 6.21, "Wein", createdBestellartikel.id).to_json())
+        "Rotwein", "Wein", createdBestellartikel.id).to_json())
 
 
-def test_update_bestellartikel_required_field_to_null_not_ok(lambda_context, dynamodb_table):
+def test_update_bestellartikel_required_field_to_null_not_ok(lambda_context, bestellartikel_table):
     item = {
         'bezeichnung': "Rotwein",
-        "preisInEuro": "5.21",
         "gruppe": "Wein"
     }
     createdBestellartikel = bestellartikel_controller.create_bestellartikel(
@@ -46,7 +43,6 @@ def test_update_bestellartikel_required_field_to_null_not_ok(lambda_context, dyn
     }
     itemUpdate = {
         'bezeichnung': "Rotwein",
-        "preisInEuro": "5.21",
         "gruppe": None
     }
     response = bestellung_handler.handle(event(
@@ -56,13 +52,12 @@ def test_update_bestellartikel_required_field_to_null_not_ok(lambda_context, dyn
         400, json.dumps({'error_text': "'gruppe' not present."}))
 
 
-def test_update_bestellartikel_with_unknown_id_not_ok(lambda_context, dynamodb_table):
+def test_update_bestellartikel_with_unknown_id_not_ok(lambda_context, bestellartikel_table):
     pathParameters = {
         "id": 'unknown'
     }
     itemUpdate = {
         'bezeichnung': "Rotwein",
-        "preisInEuro": "5.21",
         "gruppe": "Wein"
     }
     response = bestellung_handler.handle(event(
@@ -72,10 +67,9 @@ def test_update_bestellartikel_with_unknown_id_not_ok(lambda_context, dynamodb_t
         400, json.dumps({'error_text': "unknown id 'unknown' (tenant='mytenant1')."}))
 
 
-def test_update_bestellartikel_without_body_not_ok(lambda_context, dynamodb_table):
+def test_update_bestellartikel_without_body_not_ok(lambda_context, bestellartikel_table):
     item = {
         'bezeichnung': "Rotwein",
-        "preisInEuro": "5.21",
         "gruppe": "Wein"
     }
     createdBestellartikel = bestellartikel_controller.create_bestellartikel(
@@ -92,13 +86,12 @@ def test_update_bestellartikel_without_body_not_ok(lambda_context, dynamodb_tabl
         {'error_text': 'body not present.'}))
 
 
-def test_update_bestellartikel_without_tenant_id_not_ok(lambda_context, dynamodb_table):
+def test_update_bestellartikel_without_tenant_id_not_ok(lambda_context, bestellartikel_table):
     headers = {
         'Content-Type': 'application/json'
     }
     item = {
         'bezeichnung': "Rotwein",
-        "preisInEuro": "5.21",
         "gruppe": "Wein"
     }
     createdBestellartikel = bestellartikel_controller.create_bestellartikel(
@@ -109,7 +102,6 @@ def test_update_bestellartikel_without_tenant_id_not_ok(lambda_context, dynamodb
     }
     itemUpdate = {
         'bezeichnung': "Rotwein",
-        "preisInEuro": "5",
         "gruppe": "Wein"
     }
     response = bestellung_handler.handle(event(
