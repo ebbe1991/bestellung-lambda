@@ -3,10 +3,9 @@ import bestellartikel_controller
 import bestellung_controller
 from bestellartikel_controller import BestellartikelDTO
 from bestellung_controller import BestellungDTO
-from lambda_utils.response_utils import response, empty_response
-from lambda_utils.event_utils import extract_body, extract_stichtag, extract_tenant
+from lambda_utils.response_utils import response, empty_response, to_json_array
+from lambda_utils.event_utils import extract_body, extract_tenant
 from lambda_utils.exception import ValidationException
-import json
 app = APIGatewayHttpResolver()
 
 
@@ -52,7 +51,8 @@ def getAll():
     tenant_id = extract_tenant(event)
     bestellartikelliste = bestellartikel_controller.get_bestellartikelliste(
         tenant_id)
-    return response(200, json.dumps(bestellartikelliste, default=BestellartikelDTO.to_json))
+    body = to_json_array(list(map(BestellartikelDTO.to_json, bestellartikelliste)))
+    return response(200, body)
 
 
 @app.delete('/api/bestellartikel/<id>')
@@ -104,7 +104,8 @@ def getAll():
     tenant_id = extract_tenant(event)
     bestellungen = bestellung_controller.get_bestellungen(
         tenant_id)
-    return response(200, json.dumps(bestellungen, default=BestellartikelDTO.to_json))
+    body = to_json_array(list(map(BestellungDTO.to_json, bestellungen)))
+    return response(200, body)
 
 
 @app.delete('/api/bestellung/<id>')

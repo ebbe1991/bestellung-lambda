@@ -24,6 +24,22 @@ def test_get_bestellartikelliste_ok(lambda_context, bestellartikel_table):
     assert len(body) == 2
 
 
+def test_get_bestellartikelliste_one_element_ok(lambda_context, bestellartikel_table):
+    item = {
+        'bezeichnung': "Rotwein",
+        "gruppe": "Wein"
+    }
+    created_bestellartikel = bestellartikel_controller.create_bestellartikel(DEFAULT_TENANT_ID, item)
+
+    response = bestellung_handler.handle(
+        event('/api/bestellartikel', 'GET'), lambda_context)
+    body = extract_body(response)
+
+    assert extract_status_code(response) == 200
+    assert len(body) == 1
+    assert json.dumps(body[0]) == created_bestellartikel.to_json()
+
+
 def test_get_bestellartikelliste_empty_ok(lambda_context, bestellartikel_table):
     response = bestellung_handler.handle(
         event('/api/bestellartikel', 'GET'), lambda_context)

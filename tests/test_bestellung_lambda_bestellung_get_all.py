@@ -28,6 +28,24 @@ def test_get_bestellungen_ok(lambda_context, bestellung_table):
     assert len(body) == 2
 
 
+def test_get_bestellungen_one_element_ok(lambda_context, bestellung_table):
+    item = {
+        'bezeichnung': "Kekse",
+        'beschreibung': "Auswahl an Keksen",
+        "preisInEuro": 9,
+        "gruppen": ['Kekse']
+    }
+    created_bestellung = bestellung_controller.create_bestellung(DEFAULT_TENANT_ID, item)
+
+    response = bestellung_handler.handle(
+        event('/api/bestellung', 'GET'), lambda_context)
+    body = extract_body(response)
+
+    assert extract_status_code(response) == 200
+    assert len(body) == 1
+    assert json.dumps(body[0]) == created_bestellung.to_json() 
+
+
 def test_get_bestellungen_empty_ok(lambda_context, bestellung_table):
     response = bestellung_handler.handle(
         event('/api/bestellung', 'GET'), lambda_context)
