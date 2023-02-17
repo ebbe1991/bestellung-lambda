@@ -11,13 +11,12 @@ def create(item: dict):
     preisInEuro = item.get('preisInEuro')
     check_required_field(preisInEuro, 'preisInEuro')
     gruppen = item.get('gruppen')
-    check_list_not_empty(gruppen, 'gruppen')
     aktiv = item.get('aktiv')
     return BestellungDTO(
         bezeichnung,
         beschreibung,
         float(preisInEuro),
-        gruppen,
+        gruppen if gruppen is not None else list(),
         parse_bool(aktiv) if aktiv is not None else True,
         item.get('id')
     )

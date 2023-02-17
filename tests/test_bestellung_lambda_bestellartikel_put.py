@@ -1,5 +1,4 @@
 import json
-from datetime import date
 from src import bestellartikel_controller
 from src import bestellung_handler
 from src.bestellartikel_dto import BestellartikelDTO

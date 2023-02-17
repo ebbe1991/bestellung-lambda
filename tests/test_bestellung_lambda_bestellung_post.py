@@ -82,19 +82,21 @@ def test_create_bestellung_missing_field_preisInEuro_bad_request(lambda_context,
         {'error_text': "'preisInEuro' not present."}))
 
 
-def test_create_bestellung_missing_field_gruppen_bad_request(lambda_context, bestellung_table):
+def test_create_bestellung_missing_field_gruppen_ok(lambda_context, bestellung_table):
     item = {
         'bezeichnung': "Wein",
         "preisInEuro": "5.55"
     }
     response = bestellung_handler.handle(
         event('/api/bestellung', 'POST', json.dumps(item)), lambda_context)
+    id = extract_id(response)
 
-    assert response == lambda_response(
-        400, json.dumps({'error_text': "list 'gruppen' is empty."}))
+    assert id is not None
+    assert response == lambda_response(201, BestellungDTO(
+        "Wein", None, 5.55, [], True, id).to_json())
 
 
-def test_create_bestellung_gruppen_empty_bad_request(lambda_context, bestellung_table):
+def test_create_bestellung_gruppen_empty_ok(lambda_context, bestellung_table):
     item = {
         'bezeichnung': "Wein",
         "preisInEuro": "5.55",
@@ -102,11 +104,11 @@ def test_create_bestellung_gruppen_empty_bad_request(lambda_context, bestellung_
     }
     response = bestellung_handler.handle(
         event('/api/bestellung', 'POST', json.dumps(item)), lambda_context)
+    id = extract_id(response)
 
-    assert response == lambda_response(
-        400, json.dumps({'error_text': "list 'gruppen' is empty."}))
-
-
+    assert id is not None
+    assert response == lambda_response(201, BestellungDTO(
+        "Wein", None, 5.55, [], True, id).to_json())
 
 
 def test_create_bestellung_without_body_not_ok(lambda_context, bestellung_table):

@@ -1,5 +1,4 @@
 import json
-from datetime import date
 from src import bestellung_handler
 from src.bestellartikel_dto import BestellartikelDTO
 from tests.helper import event, lambda_response, extract_id
